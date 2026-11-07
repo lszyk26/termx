@@ -187,6 +187,21 @@
     <string name="msg_could_not_save_workspace">无法保存工作区</string>
     <string name="msg_appearance_load_failed">无法加载外观设置</string>
 
+    <string name="msg_font_imported">字体已导入。</string>
+    <string name="msg_no_readable_file">共享的内容里没有可读取的文件。</string>
+    <string name="msg_import_failed">无法导入共享文件</string>
+    <string name="msg_share_failed">无法分享这个文件</string>
+    <string name="msg_tier_not_active">%1$s 当前不可用，本次会话将使用 T0；请到“存储状态”修复访问权限。</string>
+    <string name="msg_allow_notifications">允许通知后，才能显示会话状态以及“打开”“新建会话”“全部停止”按钮。</string>
+    <string name="msg_history_unavailable">历史不可用：%1$s</string>
+    <string name="msg_history_db_error">数据库错误</string>
+    <string name="msg_service_connect_failed">无法连接终端会话服务，请再点一次开始。</string>
+    <string name="msg_all_files_settings_failed">无法打开全部文件访问设置</string>
+    <string name="msg_start_distro_failed">无法启动 %1$s</string>
+    <plurals name="msg_imported_files">
+        <item quantity="other">已导入 %1$d 个共享文件到 TermX 共享存储。</item>
+    </plurals>
+
     <!-- 会话通知 -->
     <string name="notif_title">TermX 终端</string>
     <string name="notif_channel_name">终端会话</string>
