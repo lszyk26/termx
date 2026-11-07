@@ -70,3 +70,4 @@ tmp/
 uploads/
 venv/
 # <<< server-autobackup (ssh-mcp) <<<
+.kotlin/
