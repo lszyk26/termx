@@ -827,7 +827,7 @@ class MainActivity : ComponentActivity() {
         }
         runCatching { uris.sumOf { WorkspaceTransfer.copyDocumentIntoShared(this, it, sharedDirectory()) } }
             .onSuccess { count -> storageMessage = resources.getQuantityString(R.plurals.msg_imported_files, count, count) }
-            .onFailure { storageMessage = StorageAccess.permissionHint(context, it) ?: (it.message ?: getString(R.string.msg_import_failed)) }
+            .onFailure { storageMessage = StorageAccess.permissionHint(this, it) ?: (it.message ?: getString(R.string.msg_import_failed)) }
     }
 
     private fun shareFile(file: File) {
@@ -1017,7 +1017,7 @@ class MainActivity : ComponentActivity() {
             runOnUiThread {
                 storageMessage = result.fold(
                     onSuccess = { "$label complete: $it file(s)." },
-                    onFailure = { StorageAccess.permissionHint(it) ?: (it.message ?: "$label failed") },
+                    onFailure = { StorageAccess.permissionHint(this, it) ?: (it.message ?: "$label failed") },
                 )
                 storageRevision++
             }
