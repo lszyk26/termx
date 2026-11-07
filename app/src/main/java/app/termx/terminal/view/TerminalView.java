@@ -7,6 +7,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
@@ -49,6 +51,20 @@ public final class TerminalView extends View {
 
     /** Log terminal view key and IME events. */
     private static boolean TERMINAL_VIEW_KEY_LOGGING_ENABLED = false;
+
+    /**
+     * True when the view background is fully transparent (wallpaper mode). In that case nothing
+     * clears the surface between frames, and the renderer only paints non-default cell
+     * backgrounds, so stale glyphs survive resizes and shortened lines (screen split in two).
+     * onDraw() clears the frame itself when this is set.
+     */
+    private boolean mClearFrame = false;
+
+    @Override
+    public void setBackgroundColor(int color) {
+        super.setBackgroundColor(color);
+        mClearFrame = (Color.alpha(color) == 0);
+    }
 
     /** The currently displayed terminal session, whose emulator is {@link #mEmulator}. */
     public TerminalSession mTermSession;
@@ -1119,6 +1135,10 @@ public final class TerminalView extends View {
             canvas.drawColor(0XFF000000);
             return;
         }
+
+        // With a transparent background (wallpaper mode) the previous frame is never erased and
+        // the renderer skips default-background cells, so leftover text piles up. Clear first.
+        if (mClearFrame) canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
         // render the terminal view and highlight any selected text
         int[] sel = mDefaultSelectors;
