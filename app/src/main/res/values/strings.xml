@@ -198,6 +198,23 @@
     <string name="msg_service_connect_failed">Could not connect to the terminal session service. Tap Start again.</string>
     <string name="msg_all_files_settings_failed">Could not open All-files settings</string>
     <string name="msg_start_distro_failed">Could not start %1$s</string>
+    <string name="msg_preparing_download">Preparing secure download…</string>
+    <string name="msg_downloading_progress">Downloading · %1$d / %2$d MB</string>
+    <string name="msg_downloading_bytes">Downloading · %1$d MB</string>
+    <string name="msg_install_failed">Install failed</string>
+    <string name="msg_distro_ready">%1$s is ready. Open it when you like.</string>
+    <string name="msg_service_start_blocked">Android blocked the background service start. Open TermX and tap Start again.</string>
+    <string name="msg_service_start_failed">Could not start the terminal session service.</string>
+    <string name="msg_storage_failed">%1$s failed</string>
+    <string name="storage_op_import">Import</string>
+    <string name="storage_op_export">Export</string>
+    <string name="storage_op_downloads">Downloads export</string>
+    <string name="app_terminal_fallback">Terminal</string>
+    <string name="label_linux_session">Linux session</string>
+    <plurals name="msg_storage_done">
+        <item quantity="one">%1$s complete: %2$d file.</item>
+        <item quantity="other">%1$s complete: %2$d files.</item>
+    </plurals>
     <plurals name="msg_imported_files">
         <item quantity="one">Imported %1$d shared file into TermX shared storage.</item>
         <item quantity="other">Imported %1$d shared files into TermX shared storage.</item>

@@ -374,7 +374,7 @@ class MainActivity : ComponentActivity() {
                     val importLauncher = rememberLauncherForActivityResult(
                         ActivityResultContracts.OpenDocument(),
                     ) { uri ->
-                        if (uri != null) runStorageOperation("Import") {
+                        if (uri != null) runStorageOperation(getString(R.string.storage_op_import)) {
                             WorkspaceTransfer.copyDocumentIntoShared(context, uri, sharedDir)
                         }
                     }
@@ -549,7 +549,10 @@ class MainActivity : ComponentActivity() {
                                     }
                                     runOnUiThread {
                                         historyItems = emptyList()
-                                        storageMessage = result.fold({ "Command history cleared." }, { "Could not clear history: ${it.message}" })
+                                        storageMessage = result.fold(
+                                            { getString(R.string.msg_history_cleared) },
+                                            { getString(R.string.msg_history_clear_failed, it.message ?: "") },
+                                        )
                                     }
                                 }, "termx-history-clear").start()
                             },
@@ -620,13 +623,13 @@ class MainActivity : ComponentActivity() {
                                 storageRevision++
                             },
                             onImportFile = { importLauncher.launch(arrayOf("*/*")) },
-                            onCopyWorkspaceIn = { workspace -> runStorageOperation("Import") {
+                            onCopyWorkspaceIn = { workspace -> runStorageOperation(getString(R.string.storage_op_import)) {
                                 WorkspaceTransfer.copyWorkspaceIntoShared(context, workspace.uri, sharedDir)
                             } },
-                            onCopySharedOut = { workspace -> runStorageOperation("Export") {
+                            onCopySharedOut = { workspace -> runStorageOperation(getString(R.string.storage_op_export)) {
                                 WorkspaceTransfer.copySharedIntoWorkspace(context, sharedDir, workspace.uri)
                             } },
-                            onExportDownloads = { runStorageOperation("Downloads export") {
+                            onExportDownloads = { runStorageOperation(getString(R.string.storage_op_downloads)) {
                                 WorkspaceTransfer.exportSharedToDownloads(context, sharedDir)
                             } },
                         )
@@ -651,7 +654,7 @@ class MainActivity : ComponentActivity() {
                             status = installStatuses[selectedDistroId],
                             onInstall = ::installDistro,
                             onStart = { pkg -> runCatching { startTerminal(pkg) }
-                                .onFailure { installStatuses[pkg.distroId] = it.message ?: "Could not start the distro" } },
+                                .onFailure { installStatuses[pkg.distroId] = it.message ?: getString(R.string.msg_start_distro_failed, pkg.distroName) } },
                             onCommands = { productivityPage = ProductivityPage.PALETTE },
                             onFiles = { productivityPage = ProductivityPage.FILES },
                             onProfiles = { productivityPage = ProductivityPage.PROFILES },
@@ -695,7 +698,7 @@ class MainActivity : ComponentActivity() {
                                         style = MaterialTheme.typography.titleLarge,
                                     )
                                     Column(Modifier.weight(1f)) {
-                                        Text(activeDistro?.distroName ?: "Terminal", color = Color.White,
+                                        Text(activeDistro?.distroName ?: stringResource(R.string.app_terminal_fallback), color = Color.White,
                                             style = MaterialTheme.typography.labelLarge)
                                         Text(guestDirectory, color = Color.White.copy(alpha = 0.58f),
                                             style = MaterialTheme.typography.labelSmall, maxLines = 1)
@@ -745,7 +748,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 TerminalSidePanel(
                                     backdrop = terminalBackdrop,
-                                    distroName = activeDistro?.distroName ?: "Linux session",
+                                    distroName = activeDistro?.distroName ?: stringResource(R.string.label_linux_session),
                                     distroId = activeDistro?.distroId ?: "wolfi",
                                     workingDirectory = guestDirectory,
                                     accent = terminalAccent,
@@ -888,16 +891,16 @@ class MainActivity : ComponentActivity() {
         if (installingDistroId != null) return
         installingDistroId = pkg.distroId
         installProgress[pkg.distroId] = 0f
-        installStatuses[pkg.distroId] = "Preparing secure download…"
+        installStatuses[pkg.distroId] = getString(R.string.msg_preparing_download)
         Thread({
             val result = runCatching {
                 installer.install(pkg) { downloaded, total ->
                     runOnUiThread {
                         installProgress[pkg.distroId] = if (total > 0) downloaded.toFloat() / total else 0f
                         installStatuses[pkg.distroId] = if (total > 0) {
-                            "Downloading · ${downloaded / (1024 * 1024)} / ${total / (1024 * 1024)} MB"
+                            getString(R.string.msg_downloading_progress, downloaded / (1024 * 1024), total / (1024 * 1024))
                         } else {
-                            "Downloading · ${downloaded / (1024 * 1024)} MB"
+                            getString(R.string.msg_downloading_bytes, downloaded / (1024 * 1024))
                         }
                     }
                 }
@@ -905,8 +908,8 @@ class MainActivity : ComponentActivity() {
             runOnUiThread {
                 installedRevision++
                 installStatuses[pkg.distroId] = result.fold(
-                    onSuccess = { "${pkg.distroName} is ready. Open it when you like." },
-                    onFailure = { it.message ?: "Install failed" },
+                    onSuccess = { getString(R.string.msg_distro_ready, pkg.distroName) },
+                    onFailure = { it.message ?: getString(R.string.msg_install_failed) },
                 )
                 installingDistroId = null
             }
@@ -978,9 +981,9 @@ class MainActivity : ComponentActivity() {
         } catch (failure: Exception) {
             restoringSavedSession = false
             storageMessage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && failure is ForegroundServiceStartNotAllowedException) {
-                "Android blocked the background service start. Open TermX and tap Start again."
+                getString(R.string.msg_service_start_blocked)
             } else {
-                failure.message ?: "Could not start the terminal session service."
+                failure.message ?: getString(R.string.msg_service_start_failed)
             }
         }
     }
@@ -1016,8 +1019,8 @@ class MainActivity : ComponentActivity() {
             val result = runCatching(operation)
             runOnUiThread {
                 storageMessage = result.fold(
-                    onSuccess = { "$label complete: $it file(s)." },
-                    onFailure = { StorageAccess.permissionHint(this, it) ?: (it.message ?: "$label failed") },
+                    onSuccess = { resources.getQuantityString(R.plurals.msg_storage_done, it, label, it) },
+                    onFailure = { StorageAccess.permissionHint(this, it) ?: (it.message ?: getString(R.string.msg_storage_failed, label)) },
                 )
                 storageRevision++
             }
