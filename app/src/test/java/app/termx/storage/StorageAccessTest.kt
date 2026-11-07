@@ -50,8 +50,8 @@ class StorageAccessTest {
 
     @Test
     fun permissionFailuresGetOneLineStorageHint() {
-        assertTrue(StorageAccess.permissionHint(SecurityException("denied"))!!.contains("Storage Health"))
-        assertTrue(StorageAccess.permissionHint(IllegalStateException("EACCES"))!!.contains("SAF workspace"))
+        assertTrue(StorageAccess.permissionHint(null, SecurityException("denied"))!!.contains("Storage Health"))
+        assertTrue(StorageAccess.permissionHint(null, IllegalStateException("EACCES"))!!.contains("SAF workspace"))
         assertEquals(null, StorageAccess.permissionHint(IllegalStateException("file not found")))
     }
 
